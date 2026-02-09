@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Login - Ebenezer Electronics
+{% endblock %}
+
+{% block content %}
+	<div style="text-align: center; margin-bottom: 2rem;">
+		<h2 style="color: white; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+			<i class="fa fa-sign-in"></i> Welcome Back!
+		</h2>
+		<p style="color: rgba(255,255,255,0.9);">Log in to your Ebenezer Electronics account</p>
+	</div>
+	{% with msgs =  get_flashed_messages(with_categories=True) %}
+		{% for c, msg in msgs %}
+			{% if c == 'error' %}
+				<div class="flash-error">
+			{% else %}
+				<div class="success">
+			{% endif %}
+				{{ msg | safe }}</div><br>
+		{% endfor %}
+	{% endwith %}
+	<div class="forms">
+		{{ wtf.quick_form(form) }}
+	</div>
+{% endblock %}

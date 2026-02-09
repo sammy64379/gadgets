@@ -1,0 +1,15 @@
+SECRET_KEY=BiBZCGfp4nnMh8XKS98wiDtbjM4uMQsMcxqSOGbg-pw
+DB_URI="sqlite:///test.db"
+EMAIL=
+PASSWORD=
+MPESA_CONSUMER_KEY=sfbgRw1BvlVTiAvGHfKgU1eJZCPQN5LvpQlr0xWYuOAnAzy1
+MPESA_CONSUMER_SECRET=20J2sLvmI8FBsSzaAzwQDItMcYYzgGHnwthpcwP0hParpaSIxGwoBYL7rDYqotwq
+MPESA_SHORTCODE=174379
+MPESA_PASSKEY=bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919
+MPESA_CALLBACK_URL=https://semiexpositive-amiee-refractorily.ngrok-free.dev/mpesa_callback
+MPESA_ENV=sandbox
+
+# SMS notification when you receive M-Pesa payment (optional)
+BUSINESS_PHONE=254712345678
+AFRICAS_TALKING_API_KEY=your_api_key_here
+AFRICAS_TALKING_USERNAME=sandbox

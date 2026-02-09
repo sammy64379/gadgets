@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Payment Failure - Ebenezer Electronics
+{% endblock %}
+
+{% block content %}
+    <div class="flash-error" style="max-width: 520px; margin: 3rem auto; padding: 2rem;">
+        <i class="fa fa-exclamation-triangle" style="font-size: 3rem;"></i><br><br>
+        <h3 style="margin-bottom: 0.75rem;">Payment not completed</h3>
+        <p style="margin-bottom: 1rem;">We were unable to process the M-Pesa request. Please confirm the prompt on your phone or try again.</p>
+        <a class="btn btn-outline" style="display: inline-block; margin-top: 1rem;" href="{{ url_for('cart') }}"><i class="fa fa-arrow-left"></i> Return to cart</a>
+    </div>
+{% endblock %}

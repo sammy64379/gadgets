@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}
+	Home - Ebenezer Electronics
+{% endblock %}
+
+{% block content %}
+{% with msgs =  get_flashed_messages(with_categories=True) %}
+	{% for c, msg in msgs %}
+		{% if c == 'error' %}
+			<div class="flash-error">
+		{% else %}
+			<div class="success">
+		{% endif %}
+			{{ msg | safe}}
+		</div>
+	{% endfor %}
+{% endwith %}
+
+<section class="hero hero-story">
+	<div class="hero-copy">
+		<div class="hero-tag"><i class="fa fa-sun-o"></i> Welcome to Ebenezer Electronics</div>
+		<h1>Launch-day gadgets and everyday essentials for Kenyan go-getters</h1>
+		<p>Ebenezer Electronics is a Nairobi-born marketplace curating premium smartphones, creator-ready laptops, cinematic TVs and must-have accessories—carefully vetted, price-matched daily, and delivered with concierge-level support.</p>
+		<ul class="hero-pillars">
+			<li><i class="fa fa-shield"></i> Authorized distribution partners & sealed stock</li>
+			<li><i class="fa fa-credit-card"></i> Seamless checkout via M-Pesa STK, Visa & Mastercard</li>
+			<li><i class="fa fa-map-marker"></i> Same-day Nairobi delivery, real-time upcountry tracking</li>
+		</ul>
+		<div class="cta-buttons">
+			<a class="btn btn-accent" href="{{ url_for('products') }}#catalog"><i class="fa fa-shopping-bag"></i> Browse the full catalog</a>
+			<a class="btn btn-outline" href="#why-ebenezer"><i class="fa fa-play-circle"></i> Discover our promise</a>
+		</div>
+	</div>
+	<div class="hero-visual hero-collage">
+		<div class="collage-card collage-large">
+			<img loading="lazy" src="{{ url_for('static', filename='uploads/dell-xps-13-plus-13th-gen-i7.jpg') }}" alt="Premium laptop showcase">
+			<span>Creator-ready laptops</span>
+		</div>
+		<div class="collage-card">
+			<img loading="lazy" src="{{ url_for('static', filename='uploads/samsung-galaxy-s23-fe-8gb-256gb.jpg') }}" alt="Samsung Galaxy detail">
+			<span>Flagship smartphones</span>
+		</div>
+		<div class="collage-card">
+			<img loading="lazy" src="{{ url_for('static', filename='uploads/lg-55-c3-evo-oled-4k-tv.jpg') }}" alt="OLED TV corner">
+			<span>Cinematic home viewing</span>
+		</div>
+	</div>
+</section>
+
+<section class="brand-story" id="why-ebenezer">
+	<div class="brand-definition">
+		<h2>What we do</h2>
+		<p>We blend a boutique showroom feel with digital convenience—curating launches from Samsung, Apple, Tecno, HP, Sony and more, handling warranty paperwork, and staging every delivery so you plug in with confidence.</p>
+	</div>
+	<div class="proof-grid">
+		<div class="proof-card">
+			<i class="fa fa-check-circle"></i>
+			<h4>Certified sourcing</h4>
+			<p>Every gadget is sourced from authorized distributors with serial verification before it reaches your cart.</p>
+		</div>
+		<div class="proof-card">
+			<i class="fa fa-heart"></i>
+			<h4>People-first service</h4>
+			<p>Get WhatsApp advice, trade-in guidance, and white-glove delivery setup tailored to your home or office.</p>
+		</div>
+	</div>
+</section>
+
+<section class="experience-strip">
+	<div class="experience-card">
+		<div class="experience-icon">
+			<i class="fa fa-star"></i>
+		</div>
+		<div>
+			<h4>Verified pricing</h4>
+			<p>Live benchmarks against Nairobi’s tier-one retailers keep every deal honest.</p>
+		</div>
+	</div>
+	<div class="experience-card">
+		<div class="experience-icon">
+			<i class="fa fa-shield"></i>
+		</div>
+		<div>
+			<h4>Protected checkout</h4>
+			<p>M-Pesa STK, Visa & Mastercard, plus 7-day change-of-mind returns.</p>
+		</div>
+	</div>
+	<div class="experience-card">
+		<div class="experience-icon">
+			<i class="fa fa-truck"></i>
+		</div>
+		<div>
+			<h4>Express delivery</h4>
+			<p>Same-day Nairobi dispatch and upcountry delivery with proactive tracking.</p>
+		</div>
+	</div>
+</section>
+
+{% if categories %}
+<div class="section-heading">
+	<h2>Shop by category</h2>
+</div>
+<div class="filters">
+	<a class="filter-pill {% if selected_category == 'All' and show_catalog %}active{% endif %}" href="{{ url_for('products') }}#catalog">All products</a>
+	{% for cat in categories %}
+		<a class="filter-pill {% if selected_category == cat.value %}active{% endif %}" href="{{ url_for('home', category=cat.value) }}#catalog">{{ cat.label }}</a>
+	{% endfor %}
+</div>
+{% if not show_catalog and not search %}
+<div class="category-hint">
+	<p>Select a category above to explore products without crowding the homepage.</p>
+	<a class="btn btn-outline" href="{{ url_for('products') }}#catalog"><i class="fa fa-th-large"></i> Browse all products</a>
+</div>
+{% endif %}
+{% endif %}
+
+<section id="featured" style="margin-top: 3rem;">
+	<div class="section-heading">
+		<h2>Featured picks</h2>
+		<span style="color: var(--muted);">Top-rated phones, laptops & accessories</span>
+	</div>
+	<div class="items">
+		{% for product in featured_products %}
+			<div class="item">
+				<a href="{{ url_for('item', id=product.id) }}" class="img-wrapper">
+					<img loading="lazy" src="{{ product.image }}" alt="{{ product.name }} product photo" class="pic">
+				</a>
+				<div class="item-content">
+					<h3 class="item-title">{{ product.name }}</h3>
+					<span class="item-category">{{ category_labels.get(product.category, product.category.title()) }}</span>
+					<div class="price-tag">{{ product.price | currency_kes }}</div>
+					<div class="rating">
+						<i class="fa fa-star"></i>4.8<span>{{ range(40, 95) | random }} verified reviews</span>
+					</div>
+				</div>
+				<div class="item-actions">
+					<a class="btn btn-outline" href="{{ url_for('item', id=product.id) }}">View details</a>
+					<form method="POST" action="{{ url_for('add_to_cart', id=product.id) }}">
+						<input type="hidden" name="quantity" value="1">
+						<button type="submit" class="btn-add"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+					</form>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+</section>
+
+{% if show_catalog %}
+<section id="catalog" style="margin-top: 3rem;">
+	<div class="section-heading">
+		<h2>
+		{% if search %}
+			Search results for “{{ query }}”
+		{% elif selected_category != 'All' %}
+			{{ selected_category_label }}
+		{% else %}
+			All products
+		{% endif %}
+		</h2>
+		<span style="color: var(--muted);">Pay in seconds with M-Pesa STK push</span>
+	</div>
+
+	{% if items %}
+	<div class="items">
+		{% for product in items %}
+			<div class="item">
+				<a href="{{ url_for('item', id=product.id) }}" class="img-wrapper">
+					<img loading="lazy" src="{{ product.image }}" alt="{{ product.name }} product photo" class="pic">
+				</a>
+				<div class="item-content">
+					<h3 class="item-title">{{ product.name }}</h3>
+					<span class="item-category">{{ category_labels.get(product.category, product.category.title()) }}</span>
+					<div class="price-tag">{{ product.price | currency_kes }}</div>
+					<div class="rating">
+						<i class="fa fa-star"></i>4.7<span>{{ range(25, 80) | random }} customer reviews</span>
+					</div>
+				</div>
+				<div class="item-actions">
+					<a class="btn btn-outline" href="{{ url_for('item', id=product.id) }}">View details</a>
+					<form method="POST" action="{{ url_for('add_to_cart', id=product.id) }}">
+						<input type="hidden" name="quantity" value="1">
+						<button type="submit" class="btn-add"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+					</form>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+	{% else %}
+		<div class="flash-error">
+			No items found for this selection.<br>
+			<a href="{{ url_for('home') }}">Browse all gadgets</a>
+		</div>
+	{% endif %}
+</section>
+{% endif %}
+
+<section class="trust-section">
+	<div class="trust-card">
+		<i class="fa fa-credit-card"></i>
+		<strong>Accepted payments</strong>
+		<p>M-Pesa • Visa • Mastercard • Airtel Money</p>
+	</div>
+	<div class="trust-card">
+		<i class="fa fa-refresh"></i>
+		<strong>Hassle-free returns</strong>
+		<p>7-day change-of-mind return window on unopened gadgets.</p>
+	</div>
+	<div class="trust-card">
+		<i class="fa fa-phone"></i>
+		<strong>Need help deciding?</strong>
+		<p>Call/WhatsApp 0712 345 678 for expert shopping assistance.</p>
+	</div>
+</section>
+{% endblock %}

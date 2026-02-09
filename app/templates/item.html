@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+	{{ item.name }} - Ebenezer Electronics
+{% endblock %}
+
+{% block content %}
+{% with msgs =  get_flashed_messages(with_categories=True) %}
+{% for c, msg in msgs %}
+	{% if c == 'error' %}
+		<div class="flash-error">
+	{% else %}
+		<div class="success">
+	{% endif %}
+		{{ msg | safe}}</div><br>
+{% endfor %}
+{% endwith %}
+
+<div class="item-display">
+	<div class="row">
+		<div class="col-md-6 mb-4">
+			<div class="img-wrapper product-image-container">
+				<img loading="lazy" src="{{ item.image }}" alt="{{ item.name }} product photo" class="pic product-image">
+			</div>
+		</div>
+		<div class="col-md-6">
+			<h2 style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.name }}</h2>
+			<p class="item-category" style="margin-bottom: 1rem;">{{ category_label }}</p>
+			<div class="rating" style="margin-bottom: 1rem;">
+				<i class="fa fa-star"></i>4.8<span>{{ range(40, 95) | random }} verified reviews</span>
+			</div>
+			<div class="price-tag" style="font-size: 2rem; margin-bottom: 1.5rem;">{{ item.price | currency_kes }}</div>
+			<ul style="padding-left: 1.1rem; margin-bottom: 1.5rem; color: var(--muted);">
+				<li>Official Kenyan warranty with service centres countrywide.</li>
+				<li>Secure payment via M-Pesa STK push or card.</li>
+				<li>Same-day delivery in Nairobi, 24-48 hrs upcountry.</li>
+			</ul>
+			<form action="{{ url_for('add_to_cart', id=item.id) }}" method="POST" style="background: var(--white); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
+				<div class="form-group">
+					<label for="quantity" style="font-weight: 600; color: var(--text);"><i class="fa fa-shopping-cart"></i> Quantity</label>
+					<input type="number" id="quantity" class="form-control" value="1" name="quantity" min="1" max="5" required>
+				</div>
+				<button type="submit" class="btn-add" style="width: 100%; margin-top: 1rem;"><i class="fa fa-mobile"></i> Checkout with M-Pesa</button>
+			</form>
+		</div>
+	</div>
+
+	<div class="product-tabs">
+		<ul class="nav nav-tabs" id="productTabs" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link active" id="specs-tab" data-toggle="tab" href="#specs" role="tab" aria-controls="specs" aria-selected="true">Specifications</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="faqs-tab" data-toggle="tab" href="#faqs" role="tab" aria-controls="faqs" aria-selected="false">FAQs</a>
+			</li>
+		</ul>
+		<div class="tab-content" id="productTabsContent">
+			<div class="tab-pane fade show active" id="specs" role="tabpanel" aria-labelledby="specs-tab">
+				<ul>
+					{% for spec in specs %}
+						<li><strong>{{ spec[0] }}:</strong> {{ spec[1] }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+			<div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+				{% for review in reviews %}
+					<div style="margin-bottom: 1.5rem;">
+						<strong>{{ review.name }}</strong>
+						<span style="color: var(--muted);">· {{ review.time }}</span><br>
+						<span style="color: #f59e0b;">
+							{% for star in range(review.rating) %}
+								<i class="fa fa-star"></i>
+							{% endfor %}
+						</span>
+						<p style="margin-top: 0.5rem;">{{ review.comment }}</p>
+					</div>
+				{% endfor %}
+			</div>
+			<div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
+				{% for faq in faqs %}
+					<div style="margin-bottom: 1.5rem;">
+						<strong>{{ faq.question }}</strong>
+						<p style="margin: 0.5rem 0 0 0;">{{ faq.answer }}</p>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
