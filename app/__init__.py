@@ -234,37 +234,10 @@ def register():
         return redirect(url_for('login'))
     return render_template("register.html", form=form)
 
-@app.route('/confirm/<token>')
-def confirm_email(token):
-    try:
-        confirm_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-        email = confirm_serializer.loads(token, salt='email-confirmation-salt', max_age=3600)
-    except:
-        flash('The confirmation link is invalid or has expired.', 'error')
-        return redirect(url_for('login'))
-    user = User.query.filter_by(email=email).first()
-    if user.email_confirmed:
-        flash(f'Account already confirmed. Please login.', 'success')
-    else:
-        user.email_confirmed = True
-        db.session.add(user)
-        db.session.commit()
-        flash('Email address successfully confirmed!', 'success')
-    return redirect(url_for('login'))
-
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
-
-@app.route("/resend")
-@login_required
-def resend():
-    # Resend confirmation email route removed to avoid dependency
-    # on the `email_confirmation.html` template. Use the admin
-    # or a separate background task to resend emails if needed.
-    flash('Resend confirmation route is disabled.', 'error')
     return redirect(url_for('login'))
 
 @app.route("/add/<id>", methods=['POST'])
@@ -366,21 +339,23 @@ def mpesa_checkout():
     password, timestamp = generate_password()
     headers = {"Authorization": f"Bearer {access_token}"}
     # Attach user id to callback URL so we can fulfill the order on callback
-    base_callback = os.environ['MPESA_CALLBACK_URL']
+    base_callback="https://semiexpositive-amiee-refractorily.ngrok-free.dev/mpesa_callback"
+    
     callback_with_uid = f"{base_callback}?uid={current_user.id}"
     payload = {
-        "BusinessShortCode": os.environ['MPESA_SHORTCODE'],
+        "BusinessShortCode": 174379,
         "Password": password,
         "Timestamp": timestamp,
         "TransactionType": "CustomerPayBillOnline",
         "Amount": amount,
         "PartyA": phone,
-        "PartyB": os.environ['MPESA_SHORTCODE'],
+        "PartyB": 174379,
         "PhoneNumber": phone,
         "CallBackURL": callback_with_uid,
         "AccountReference": str(current_user.id),
         "TransactionDesc": "Cart Payment"
     }
+    print(payload)    
     response = requests.post(
         "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
         headers=headers,
