@@ -15,3 +15,19 @@ class RegisterForm(FlaskForm):
 	password = PasswordField("Password:", validators=[DataRequired(), Regexp("^[a-zA-Z0-9_\-&$@#!%^*+.]{8,30}$", message='Password must be 8 characters long and should contain letters, numbers and symbols.')])
 	confirm = PasswordField("Confirm Password:",validators=[EqualTo('password', message='Passwords must match')])
 	submit = SubmitField("Register")
+
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+    def validate_email(self, email):
+        from .db_models import User
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            from wtforms.validators import ValidationError
+            raise ValidationError('There is no account with that email. You must register first.')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("Password:", validators=[DataRequired(), Regexp("^[a-zA-Z0-9_\-&$@#!%^*+.]{8,30}$", message='Password must be 8 characters long and should contain letters, numbers and symbols.')])
+    confirm = PasswordField("Confirm Password:",validators=[EqualTo('password', message='Passwords must match')])
+    submit = SubmitField('Reset Password')

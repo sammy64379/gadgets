@@ -14,7 +14,8 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 from .db_models import db, User, Item
 from itsdangerous import URLSafeTimedSerializer
 from .funcs import mail, fulfill_order
-from .admin.routes import admin
+# import the admin blueprint from its package
+from .admin import admin
 from sqlalchemy import func
 
 app = Flask(__name__)
@@ -39,9 +40,15 @@ with app.app_context():
     db.create_all()
 
 CATEGORY_LABELS = {
-    'Apple': 'Smartphones',
-    'laptop': 'Laptops',
-    'Television': 'TV & Home Entertainment'
+    'phones': 'Smartphones & Tablets',
+    'laptops': 'Computing & Accessories',
+    'electronics': 'Bluetooth & Headphones',
+    'gaming': 'Gaming & Consoles',
+    'wearables': 'Smartwatches & Wearables',
+    'appliances': 'Home & Kitchen Electronics',
+    'cameras': 'Cameras & Photography',
+    'health': 'Health & Medical Gadgets',
+    'power': 'Power & Charging Gadgets'
 }
 
 @app.context_processor
@@ -176,11 +183,10 @@ def home():
     if selected_category and selected_category.lower() != 'all':
         items_query = items_query.filter(func.lower(Item.category) == selected_category.lower())
     items = items_query.all()
-    show_catalog = bool(selected_category and selected_category.lower() != 'all')
     context = build_home_context(
         items,
         selected_category=selected_category if selected_category else 'All',
-        show_catalog=show_catalog
+        show_catalog=True
     )
     return render_template("home.html", **context)
 
@@ -199,11 +205,14 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         user = User.query.filter_by(email=email).first()
-        if user == None:
+        if user is None:
             flash(f'User with email {email} doesn\'t exist!<br> <a href={url_for("register")}>Register now!</a>', 'error')
             return redirect(url_for('login'))
         elif check_password_hash(user.password, form.password.data):
             login_user(user)
+            # send admins into their own area, customers to the public site
+            if user.admin:
+                return redirect(url_for('admin.dashboard'))
             return redirect(url_for('home'))
         else:
             flash("Email and password incorrect!!", "error")
@@ -229,7 +238,6 @@ def register():
                         phone=form.phone.data)
         db.session.add(new_user)
         db.session.commit()
-        # send_confirmation_email(new_user.email)
         flash('Thanks for registering! You may login now.', 'success')
         return redirect(url_for('login'))
     return render_template("register.html", form=form)

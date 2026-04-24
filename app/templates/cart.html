@@ -1,83 +1,114 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Cart - Ebenezer Electronics
+    Shopping Cart - Ebenezer Electronics
 {% endblock %}
 
 {% block content %}
 {% with msgs =  get_flashed_messages(with_categories=True) %}
 {% for c, msg in msgs %}
 	{% if c == 'error' %}
-		<div class="flash-error">
+		<div class="flash-error flash-message" style="border-left-color: var(--error);">
 	{% else %}
-		<div class="success">
+		<div class="success flash-message" style="border-left-color: var(--success);">
 	{% endif %}
 		{{ msg | safe}}</div><br>
 {% endfor %}
 {% endwith %}
 
 {% if not items %}
-	<div class="flash-error" style="text-align: center;">
-		<i class="fa fa-shopping-cart" style="font-size: 3rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
-		<h3>Your cart is empty!</h3>
-		<p>Start shopping to add items to your cart</p>
-		<a href="{{ url_for('home') }}" style="color: var(--accent); font-weight: 600; text-decoration: underline;">
-			<i class="fa fa-arrow-left"></i> Discover new items
-		</a>
-	</div>
-{% else %}
-	<div class="section-heading">
-		<h2><i class="fa fa-shopping-cart"></i> Shopping Cart</h2>
-		<a class="btn btn-outline" href="{{ url_for('home') }}"><i class="fa fa-plus"></i> Add more items</a>
-	</div>
-
-	<div class="items">
-	{% for i in range(items|length) %}
-		<div class="item">
-			<div class="img-wrapper">
-				<img loading="lazy" src="{{ items[i].image }}" alt="{{ items[i].name }}" class="pic">
-			</div>
-			<div class="item-content">
-				<h3 class="item-title">{{ items[i].name }}</h3>
-				<span class="item-category">{{ category_labels.get(items[i].category, items[i].category.title()) if category_labels is defined else items[i].category }}</span>
-				<div class="price-tag">{{ items[i].price | currency_kes }}</div>
-				<p style="margin: 0; color: var(--muted);">Quantity: {{ quantity[i] }}</p>
-				<p style="margin: 0; color: var(--muted);">Subtotal: {{ (quantity[i]*items[i].price) | currency_kes }}</p>
-			</div>
-			<div class="item-actions" style="margin-top: 1rem;">
-				<a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}" class="remove-from-cart" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
-					<i class="fa fa-times"></i> Remove
-				</a>
+	<div class="cart-main" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+		<div style="max-width: 400px; margin: 0 auto;">
+			<img src="https://m.media-amazon.com/images/G/01/cart/empty/kettle-desaturated._CB424694257_.svg" alt="Empty Cart" style="width: 100%; margin-bottom: 24px; opacity: 0.9;">
+			<h2 style="font-size: 24px; margin-bottom: 12px; font-weight: 700;">Your Cart is empty</h2>
+			<p style="color: var(--text-muted); margin-bottom: 24px; font-size: 14px;">Check out today's deals or discover new items to add to your cart.</p>
+			<div style="display: flex; gap: 12px; justify-content: center;">
+				<a href="{{ url_for('home') }}" class="btn-checkout" style="width: auto; padding: 10px 24px; margin: 0;">Continue shopping</a>
 			</div>
 		</div>
-	{% endfor %}
 	</div>
+{% else %}
+	<div class="cart-layout">
+		<!-- Main Cart Items -->
+		<div class="cart-main">
+			<div class="cart-header">
+				<h2>Shopping Cart</h2>
+				<span class="price-label">Price</span>
+			</div>
+			
+			<div class="cart-items">
+			{% for i in range(items|length) %}
+				<div class="cart-item">
+					<div class="cart-item-img">
+						<img loading="lazy" src="{{ items[i].display_image if items[i].display_image else items[i].image }}" alt="{{ items[i].name }}">
+					</div>
+					<div class="cart-item-details">
+						<div class="cart-item-title">
+							<a href="{{ url_for('item', id=items[i].id) }}">{{ items[i].name }}</a>
+						</div>
+						<div class="cart-item-stock">In Stock</div>
+						<div class="cart-item-category">
+							Eligible for FREE Shipping
+						</div>
+						
+						<div class="cart-item-actions">
+							<span style="font-size: 13px; font-weight: 600; background: var(--surface-alt); padding: 4px 8px; border-radius: var(--radius); border: 1px solid var(--border);">Qty: {{ quantity[i] }}</span>
+							<span style="color: var(--border);">|</span>
+							<a href="{{ url_for('remove', id=items[i].id, quantity=quantity[i]) }}" class="cart-item-remove">Delete</a>
+						</div>
+					</div>
+					<div class="cart-item-price">
+						{{ items[i].price | currency_kes }}
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+			
+			<div style="text-align: right; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border-light);">
+				<span style="font-size: 18px;">Subtotal ({{ items|length }} items): </span>
+				<span style="font-size: 18px; font-weight: 700;">{{ price | currency_kes }}</span>
+			</div>
+		</div>
 
-	{% if price %}
-	<div class="check">
-		<form method="POST" action="{{ url_for('mpesa_checkout') }}">
-			<input type="hidden" value="{{ price }}" name="amount">
-			<div style="text-align: center; margin-bottom: 1.5rem;">
-				<h3 style="color: var(--accent); font-weight: 700;">
-					<i class="fa fa-money"></i> Grand Total: {{ price | currency_kes }}
-				</h3>
-				<p style="color: var(--muted); margin: 0;">All prices inclusive of VAT • Safe M-Pesa checkout</p>
+		<!-- Right Sidebar: Order Summary -->
+		<div class="cart-sidebar">
+			<div class="order-summary">
+				<div style="font-size: 13px; margin-bottom: 16px; line-height: 1.4;">
+					<i class="fa fa-check-circle" style="color: var(--success); font-size: 16px; vertical-align: middle;"></i> 
+					<span style="color: var(--success); font-weight: 600;">Your order is eligible for FREE Delivery.</span> 
+					<span style="color: var(--text-muted);">Select this option at checkout.</span>
+				</div>
+				
+				<div style="font-size: 18px; margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 16px;">
+					Subtotal ({{ items|length }} items): <br>
+					<span style="font-weight: 700; font-size: 24px; color: var(--text);">{{ price | currency_kes }}</span>
+				</div>
+
+				{% if price %}
+				<form method="POST" action="{{ url_for('mpesa_checkout') }}">
+					<input type="hidden" value="{{ price }}" name="amount">
+					
+					<div class="mpesa-form" style="margin-top: 0;">
+						<label for="phone" style="display: flex; justify-content: space-between; align-items: center;">
+							M-Pesa Number
+							<img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" height="20" alt="M-Pesa">
+						</label>
+						<input type="text" id="phone" name="phone" placeholder="e.g. 254712345678" required>
+						<small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: -8px;">Format: 2547XXXXXXXX (Kenya)</small>
+					</div>
+					
+					<button class="btn-checkout">
+						Proceed to Checkout
+					</button>
+					
+					<div style="margin-top: 16px; text-align: center; color: var(--text-muted); font-size: 12px; line-height: 1.5;">
+						<i class="fa fa-lock"></i> Secure checkout powered by Daraja API.<br>
+						Need help? Call 0712 345 678
+					</div>
+				</form>
+				{% endif %}
 			</div>
-			<div class="form-group">
-				<label for="phone" style="font-weight: 600; color: var(--text);">
-					<i class="fa fa-phone"></i> Enter your M-Pesa phone number
-				</label>
-				<input type="text" class="form-control" id="phone" name="phone" placeholder="e.g. 254712345678" required>
-				<small class="form-text text-muted">Format: 2547XXXXXXXX (Kenya)</small>
-			</div>
-			<button class="checkout">
-				<i class="fa fa-mobile"></i> Pay with M-Pesa (STK Push)
-			</button>
-			<p style="text-align: center; color: var(--muted); margin-top: 1rem; font-size: 0.9rem;">
-				Securely processed via Safaricom Daraja • Need help? Call 0712 345 678
-			</p>
-		</form>
+		</div>
 	</div>
-	{% endif %}
 {% endif %}
 {% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Admin Login - Ebenezer Electronics
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+	<div style="width: 100%; max-width: 400px;">
+		<div class="auth-logo">
+			Ebenezer <span>Admin</span>
+		</div>
+		
+		<div class="auth-box">
+			<h2>Administrator Sign-In</h2>
+			
+			{% with msgs = get_flashed_messages(with_categories=True) %}
+				{% for c, msg in msgs %}
+					{% if c == 'error' %}
+						<div class="flash-error flash-message" style="margin-bottom: 16px; position: static; animation: none;">
+					{% else %}
+						<div class="success flash-message" style="margin-bottom: 16px; position: static; animation: none;">
+					{% endif %}
+						{{ msg | safe }}</div>
+				{% endfor %}
+			{% endwith %}
+			
+			{{ wtf.quick_form(form) }}
+			
+			<div style="margin-top: 24px; font-size: 13px; text-align: center;">
+				<a href="{{ url_for('login') }}" style="color: var(--secondary);"><i class="fa fa-arrow-left"></i> Back to Customer Login</a>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

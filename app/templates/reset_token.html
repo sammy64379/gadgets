@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+	New Password - Ebenezer Electronics
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+	<div style="width: 100%; max-width: 400px;">
+		<div class="auth-logo">
+			Ebenezer <span>Electronics</span>
+		</div>
+		
+		<div class="auth-box">
+			<h2>Create new password</h2>
+			<p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">We'll ask for this password whenever you sign in.</p>
+			
+			{% with msgs = get_flashed_messages(with_categories=True) %}
+				{% for c, msg in msgs %}
+					{% if c == 'error' or c == 'warning' %}
+						<div class="flash-error flash-message" style="margin-bottom: 16px; position: static; animation: none;">
+					{% else %}
+						<div class="success flash-message" style="margin-bottom: 16px; position: static; animation: none; border-left-color: var(--success);">
+					{% endif %}
+						{{ msg | safe }}</div>
+				{% endfor %}
+			{% endwith %}
+			
+			{{ wtf.quick_form(form) }}
+			
+		</div>
+	</div>
+</div>
+{% endblock %}
