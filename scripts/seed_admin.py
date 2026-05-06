@@ -54,20 +54,24 @@ def create_admin():
                 print(f"{email} has been promoted to admin")
             return
 
-        name = input("Name (leave blank for 'Administrator'): ").strip() or "Administrator"
+        name = (
+            input("Name (leave blank for 'Administrator'): ").strip() or "Administrator"
+        )
         password = getpass("Password: ")
         confirm = getpass("Confirm password: ")
         if password != confirm:
             print("Passwords do not match, aborting")
             return
 
-        hashed = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
-        user = User(name=name,
-                    email=email,
-                    password=hashed,
-                    phone="",
-                    admin=True,
-                    email_confirmed=True)
+        hashed = generate_password_hash(password, method="pbkdf2:sha256", salt_length=8)
+        user = User(
+            name=name,
+            email=email,
+            password=hashed,
+            phone="",
+            admin=True,
+            email_confirmed=True,
+        )
         db.session.add(user)
         db.session.commit()
         print(f"Created admin user {email}")

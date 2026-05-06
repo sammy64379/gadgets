@@ -15,22 +15,24 @@ items_to_check = [
     "HP Pavilion 15 (Ryzen 7 7730U)",
     "HP Spectre x360 14 (Core Ultra 7)",
     "Samsung Galaxy A55 5G (8GB/256GB)",
-    "Samsung Galaxy S23 FE (8GB/256GB)"
+    "Samsung Galaxy S23 FE (8GB/256GB)",
 ]
 
 if os.path.exists(db_path):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    
+
     print("Checking items in database:")
     for item in items_to_check:
-        cursor.execute("SELECT id, name, image FROM items WHERE name LIKE ?", (f"%{item}%",))
+        cursor.execute(
+            "SELECT id, name, image FROM items WHERE name LIKE ?", (f"%{item}%",)
+        )
         result = cursor.fetchone()
         if result:
             print(f"FOUND: {result[0]} | {result[1]} | {result[2]}")
         else:
             print(f"NOT FOUND: {item}")
-    
+
     conn.close()
 else:
     print(f"Database not found at {db_path}")

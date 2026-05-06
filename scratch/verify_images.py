@@ -3,10 +3,12 @@ import sqlite3
 import os
 import sys
 
-sys.stdout.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding="utf-8")
 
 DB_PATH = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\test.db"
-UPLOADS_DIR = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+UPLOADS_DIR = (
+    r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+)
 
 items_to_check = [
     "Philips Airfryer XXL XXL Digital",
@@ -20,18 +22,22 @@ items_to_check = [
     "HP Pavilion 15 (Ryzen 7 7730U)",
     "HP Spectre x360 14 (Core Ultra 7)",
     "Samsung Galaxy A55 5G (8GB/256GB)",
-    "Samsung Galaxy S23 FE (8GB/256GB)"
+    "Samsung Galaxy S23 FE (8GB/256GB)",
 ]
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
-print(f"{'STATUS':<10} {'ID':<5} {'NAME':<45} {'IMAGE FILE EXISTS?':<20} {'IMAGE PATH'}")
+print(
+    f"{'STATUS':<10} {'ID':<5} {'NAME':<45} {'IMAGE FILE EXISTS?':<20} {'IMAGE PATH'}"
+)
 print("-" * 140)
 
 all_ok = True
 for item in items_to_check:
-    cursor.execute("SELECT id, name, image FROM items WHERE name LIKE ?", (f"%{item}%",))
+    cursor.execute(
+        "SELECT id, name, image FROM items WHERE name LIKE ?", (f"%{item}%",)
+    )
     result = cursor.fetchone()
     if result:
         item_id, name, image_path = result

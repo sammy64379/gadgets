@@ -1,5 +1,6 @@
 import os
 from functools import lru_cache
+from datetime import datetime
 
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
@@ -46,8 +47,7 @@ def resolve_professional_image(image_url):
 
     try:
         sibling_files = [
-            sibling for sibling in os.listdir(UPLOADS_DIR)
-            if sibling.startswith(stem)
+            sibling for sibling in os.listdir(UPLOADS_DIR) if sibling.startswith(stem)
         ]
     except FileNotFoundError:
         return image_url
@@ -93,17 +93,61 @@ def get_generated_fallback(item_name, category, image_url):
     """Choose the closest existing generic pro image when a product has no good match."""
     haystack = f"{item_name or ''} {category or ''} {image_url or ''}".lower()
 
-    if any(keyword in haystack for keyword in ("laptop", "macbook", "notebook", "thinkpad", "ideapad", "spectre", "pavilion", "swift", "xps", "zenbook", "nitro")):
+    if any(
+        keyword in haystack
+        for keyword in (
+            "laptop",
+            "macbook",
+            "notebook",
+            "thinkpad",
+            "ideapad",
+            "spectre",
+            "pavilion",
+            "swift",
+            "xps",
+            "zenbook",
+            "nitro",
+        )
+    ):
         return GENERATED_FALLBACKS["laptop"]
-    if any(keyword in haystack for keyword in ("tv", "oled", "qled", "bravia", "uhd", "hdr", "nanocell", "uled")):
+    if any(
+        keyword in haystack
+        for keyword in (
+            "tv",
+            "oled",
+            "qled",
+            "bravia",
+            "uhd",
+            "hdr",
+            "nanocell",
+            "uled",
+        )
+    ):
         return GENERATED_FALLBACKS["tv"]
-    if any(keyword in haystack for keyword in ("phone", "galaxy", "iphone", "redmi", "infinix", "oppo", "tecno", "xiaomi")):
+    if any(
+        keyword in haystack
+        for keyword in (
+            "phone",
+            "galaxy",
+            "iphone",
+            "redmi",
+            "infinix",
+            "oppo",
+            "tecno",
+            "xiaomi",
+        )
+    ):
         return GENERATED_FALLBACKS["phone"]
     if any(keyword in haystack for keyword in ("watch", "wearable")):
         return GENERATED_FALLBACKS["watch"]
-    if any(keyword in haystack for keyword in ("playstation", "xbox", "console", "gaming")):
+    if any(
+        keyword in haystack for keyword in ("playstation", "xbox", "console", "gaming")
+    ):
         return GENERATED_FALLBACKS["console"]
-    if any(keyword in haystack for keyword in ("headphone", "earbud", "speaker", "sony wh", "jbl")):
+    if any(
+        keyword in haystack
+        for keyword in ("headphone", "earbud", "speaker", "sony wh", "jbl")
+    ):
         return GENERATED_FALLBACKS["headphones"]
     return image_url
 
@@ -111,6 +155,7 @@ def get_generated_fallback(item_name, category, image_url):
 # =========================
 # USER MODEL
 # =========================
+
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
@@ -124,53 +169,82 @@ class User(UserMixin, db.Model):
     admin = db.Column(db.Boolean, default=False)
     email_confirmed = db.Column(db.Boolean, default=False)
 
-    cart = db.relationship('Cart', backref='buyer', lazy=True)
-    orders = db.relationship("Order", backref='customer', lazy=True)
+    cart = db.relationship("Cart", backref="buyer", lazy=True)
+    orders = db.relationship("Order", backref="customer", lazy=True)
 
     def get_reset_token(self):
         from itsdangerous import URLSafeTimedSerializer
         from flask import current_app
-        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-        return s.dumps({'user_id': self.id})
+
+        s = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+        return s.dumps({"user_id": self.id})
 
     @staticmethod
     def verify_reset_token(token, expires_sec=1800):
         from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
         from flask import current_app
-        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+
+        s = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
         try:
-            user_id = s.loads(token, max_age=expires_sec)['user_id']
+            user_id = s.loads(token, max_age=expires_sec)["user_id"]
         except (SignatureExpired, BadSignature):
             return None
         return User.query.get(user_id)
 
-
     def add_to_cart(self, itemid, quantity):
-        item_to_add = Cart(
-            itemid=itemid,
-            uid=self.id,
-            quantity=quantity
-        )
+        item_to_add = Cart(itemid=itemid, uid=self.id, quantity=quantity)
 
         db.session.add(item_to_add)
-        db.session.commit()
+        
+        # Sync to a Pending Order
+        pending_order = Order.query.filter_by(uid=self.id, status="Pending").first()
+        if not pending_order:
+            pending_order = Order(uid=self.id, date=datetime.now(), status="Pending", total_amount=0)
+            db.session.add(pending_order)
+            db.session.flush()
+            
+        item = Item.query.get(itemid)
+        ordered_item = Ordered_item.query.filter_by(oid=pending_order.id, itemid=itemid).first()
+        if ordered_item:
+            ordered_item.quantity += int(quantity)
+        else:
+            ordered_item = Ordered_item(oid=pending_order.id, itemid=itemid, quantity=int(quantity), price=item.price)
+            db.session.add(ordered_item)
+            
+        pending_order.total_amount += (item.price * int(quantity))
+        pending_order.date = datetime.now()
 
+        db.session.commit()
 
     def remove_from_cart(self, itemid, quantity):
         item_to_remove = Cart.query.filter_by(
-            itemid=itemid,
-            uid=self.id,
-            quantity=quantity
+            itemid=itemid, uid=self.id, quantity=quantity
         ).first()
 
         if item_to_remove:
             db.session.delete(item_to_remove)
+            
+            # Sync to Pending Order
+            pending_order = Order.query.filter_by(uid=self.id, status="Pending").first()
+            if pending_order:
+                ordered_item = Ordered_item.query.filter_by(oid=pending_order.id, itemid=itemid).first()
+                if ordered_item:
+                    item = Item.query.get(itemid)
+                    ordered_item.quantity -= int(quantity)
+                    pending_order.total_amount -= (item.price * int(quantity))
+                    if ordered_item.quantity <= 0:
+                        db.session.delete(ordered_item)
+                        
+                    if pending_order.total_amount <= 0:
+                        db.session.delete(pending_order)
+
             db.session.commit()
 
 
 # =========================
 # ITEM MODEL
 # =========================
+
 
 class Item(db.Model):
     __tablename__ = "items"
@@ -187,7 +261,6 @@ class Item(db.Model):
 
     stock = db.Column(db.Integer, nullable=False, default=0)
 
-    
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     orders = db.relationship("Ordered_item", backref="item", lazy=True)
@@ -200,60 +273,44 @@ class Item(db.Model):
             return get_generated_fallback(self.name, self.category, resolved_image)
         return resolved_image
 
+
 # =========================
 # CART MODEL
 # =========================
+
 
 class Cart(db.Model):
     __tablename__ = "cart"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    uid = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id'),
-        nullable=False
-    )
+    uid = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    itemid = db.Column(
-        db.Integer,
-        db.ForeignKey('items.id'),
-        nullable=False
-    )
+    itemid = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
 
-    quantity = db.Column(
-        db.Integer,
-        nullable=False,
-        default=1
-    )
+    quantity = db.Column(db.Integer, nullable=False, default=1)
 
 
 # =========================
 # ORDER MODEL
 # =========================
 
+
 class Order(db.Model):
     __tablename__ = "orders"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    uid = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id'),
-        nullable=False
-    )
+    uid = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     date = db.Column(db.DateTime, nullable=False)
 
     status = db.Column(db.String(50), nullable=False)
 
-    total_amount = db.Column(db.Float, nullable=False, default=0)  
+    total_amount = db.Column(db.Float, nullable=False, default=0)
 
     items = db.relationship(
-        "Ordered_item",
-        backref="order",
-        lazy=True,
-        cascade="all, delete"
+        "Ordered_item", backref="order", lazy=True, cascade="all, delete"
     )
 
 
@@ -261,30 +318,16 @@ class Order(db.Model):
 # ORDERED ITEM MODEL
 # =========================
 
+
 class Ordered_item(db.Model):
     __tablename__ = "ordered_items"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    oid = db.Column(
-        db.Integer,
-        db.ForeignKey('orders.id'),
-        nullable=False
-    )
+    oid = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
 
-    itemid = db.Column(
-        db.Integer,
-        db.ForeignKey('items.id'),
-        nullable=False
-    )
+    itemid = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
 
-    quantity = db.Column(
-        db.Integer,
-        nullable=False,
-        default=1
-    )
+    quantity = db.Column(db.Integer, nullable=False, default=1)
 
-    price = db.Column(
-        db.Float,
-        nullable=False
-    )
+    price = db.Column(db.Float, nullable=False)

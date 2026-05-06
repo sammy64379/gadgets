@@ -1,17 +1,19 @@
 import requests
 import re
 import urllib.parse
-import json
 import os
 import sqlite3
 
 DB_PATH = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\test.db"
-UPLOADS_DIR = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+UPLOADS_DIR = (
+    r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+)
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
 }
+
 
 def search_bing_images(query):
     headers = {
@@ -19,34 +21,39 @@ def search_bing_images(query):
     }
     url = f"https://www.bing.com/images/search?q={urllib.parse.quote(query)}&qft=+filterui:imagesize-large"
     response = requests.get(url, headers=headers, timeout=10)
-    murls = re.findall(r'murl&quot;:&quot;(.*?)&quot;', response.text)
+    murls = re.findall(r"murl&quot;:&quot;(.*?)&quot;", response.text)
     return murls
 
+
 def slugify(text):
-    return re.sub(r'[^a-zA-Z0-9]', '-', text.lower()).strip('-')
+    return re.sub(r"[^a-zA-Z0-9]", "-", text.lower()).strip("-")
+
 
 def download_best(urls, filename, min_size=15000):
     """Try each URL; keep the first one whose content >= min_size bytes."""
     for url in urls:
-        url = url.replace('&amp;', '&')
+        url = url.replace("&amp;", "&")
         try:
             resp = requests.get(url, headers=HEADERS, timeout=10)
             if resp.status_code != 200:
                 continue
-            ct = resp.headers.get('Content-Type', '')
-            if 'text/html' in ct:
+            ct = resp.headers.get("Content-Type", "")
+            if "text/html" in ct:
                 continue
             if len(resp.content) < min_size:
-                print(f"    Skipped {url[:80]}... ({len(resp.content)} bytes, too small)")
+                print(
+                    f"    Skipped {url[:80]}... ({len(resp.content)} bytes, too small)"
+                )
                 continue
             path = os.path.join(UPLOADS_DIR, filename)
-            with open(path, 'wb') as f:
+            with open(path, "wb") as f:
                 f.write(resp.content)
             print(f"    Downloaded {len(resp.content):,} bytes -> {filename}")
             return True
         except Exception as e:
             print(f"    Error: {e}")
     return False
+
 
 # Items that need better images (< 25KB currently)
 items_to_fix = [
@@ -92,7 +99,10 @@ for item in items_to_fix:
 
     if download_best(urls, item["filename"]):
         new_path = f"/static/uploads/{item['filename']}"
-        cursor.execute("UPDATE items SET image = ? WHERE name LIKE ?", (new_path, f"%{item['db_name']}%"))
+        cursor.execute(
+            "UPDATE items SET image = ? WHERE name LIKE ?",
+            (new_path, f"%{item['db_name']}%"),
+        )
         if cursor.rowcount > 0:
             print(f"  DB updated: {new_path}")
         else:

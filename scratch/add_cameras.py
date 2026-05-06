@@ -5,37 +5,45 @@ import os
 import sqlite3
 
 DB_PATH = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\test.db"
-UPLOADS_DIR = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+UPLOADS_DIR = (
+    r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+)
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
 }
 
+
 def search_bing_images(query):
     url = f"https://www.bing.com/images/search?q={urllib.parse.quote(query)}&qft=+filterui:imagesize-large"
     response = requests.get(url, headers=HEADERS, timeout=10)
-    return re.findall(r'murl&quot;:&quot;(.*?)&quot;', response.text)
+    return re.findall(r"murl&quot;:&quot;(.*?)&quot;", response.text)
+
 
 def slugify(text):
-    return re.sub(r'[^a-zA-Z0-9]', '-', text.lower()).strip('-')
+    return re.sub(r"[^a-zA-Z0-9]", "-", text.lower()).strip("-")
+
 
 def download_best(urls, filename, min_size=15000):
     for url in urls:
-        url = url.replace('&amp;', '&')
+        url = url.replace("&amp;", "&")
         try:
             resp = requests.get(url, headers=HEADERS, timeout=10)
-            if resp.status_code != 200 or 'text/html' in resp.headers.get('Content-Type', ''):
+            if resp.status_code != 200 or "text/html" in resp.headers.get(
+                "Content-Type", ""
+            ):
                 continue
             if len(resp.content) < min_size:
                 continue
             path = os.path.join(UPLOADS_DIR, filename)
-            with open(path, 'wb') as f:
+            with open(path, "wb") as f:
                 f.write(resp.content)
             return True
         except Exception:
             pass
     return False
+
 
 # 1. Update Canon R5 to a white version
 canon_search = "Canon EOS R50 white mirrorless camera product photo isolated"
@@ -48,7 +56,10 @@ if download_best(canon_urls, canon_filename):
     c = conn.cursor()
     new_path = f"/static/uploads/{canon_filename}"
     # Update the existing Canon R5 (ID=46) image and name (since R5 doesn't exist in white, we can rename it to R50 white or just edit the image)
-    c.execute("UPDATE items SET image = ?, name = ? WHERE name LIKE ?", (new_path, "Canon EOS R50 White Mirrorless", "%Canon EOS%"))
+    c.execute(
+        "UPDATE items SET image = ?, name = ? WHERE name LIKE ?",
+        (new_path, "Canon EOS R50 White Mirrorless", "%Canon EOS%"),
+    )
     conn.commit()
     print(f"Updated Canon DB: {new_path}")
     conn.close()
@@ -78,7 +89,7 @@ new_cameras = [
         "search": "Fujifilm X-T5 mirrorless camera silver product photo white background isolated",
         "filename": "fujifilm-xt5-silver-premium.jpg",
         "details": "40.2MP APS-C X-Trans CMOS 5 HR Sensor. 4K 60p, 6.2K 30p, 4:2:2 10-Bit Video. 7-Stop In-Body Image Stabilization",
-    }
+    },
 ]
 
 conn = sqlite3.connect(DB_PATH)
@@ -86,12 +97,14 @@ c = conn.cursor()
 
 for cam in new_cameras:
     print(f"Searching: {cam['search']}")
-    urls = search_bing_images(cam['search'])
-    if download_best(urls, cam['filename']):
+    urls = search_bing_images(cam["search"])
+    if download_best(urls, cam["filename"]):
         new_path = f"/static/uploads/{cam['filename']}"
         # insert into DB
-        c.execute("INSERT INTO items (name, price, category, image, details, stock) VALUES (?, ?, ?, ?, ?, ?)", 
-                 (cam['name'], cam['price'], cam['category'], new_path, cam['details'], 10))
+        c.execute(
+            "INSERT INTO items (name, price, category, image, details, stock) VALUES (?, ?, ?, ?, ?, ?)",
+            (cam["name"], cam["price"], cam["category"], new_path, cam["details"], 10),
+        )
         print(f"Added new camera: {cam['name']}")
     else:
         print(f"Failed to find image for {cam['name']}")

@@ -1,186 +1,186 @@
 {% extends "admin/base_admin.html" %}
 
 {% block content %}
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
-    <h2 class="page-title mb-0">Overview Dashboard</h2>
-    <div class="date-range text-muted" style="font-size: 14px;">
-        <i class="far fa-calendar-alt"></i> Today, {{ now.strftime('%d %b %Y') if now else '' }}
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title mb-0">Overview Dashboard</h2>
+        <div class="date-range text-muted" style="font-size: 14px;">
+            <i class="far fa-calendar-alt"></i> Today, {{ now.strftime('%d %b %Y') if now else '' }}
+        </div>
     </div>
-</div>
 
 <!-- STAT CARDS -->
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon bg-soft-orange">
-                <i class="fas fa-wallet"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-label">Total Revenue</span>
-                <h3 class="stat-value">KES {{ "{:,.0f}".format(total_revenue or 0) }}</h3>
-                <span class="stat-change text-success"><i class="fas fa-arrow-up"></i> +12% from last month</span>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-soft-orange">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Total Revenue</span>
+                    <h3 class="stat-value">KES {{ "{:,.0f}".format(total_revenue or 0) }}</h3>
+                    <span class="stat-change text-success"><i class="fas fa-arrow-up"></i> +12% from last month</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon bg-soft-blue">
-                <i class="fas fa-shopping-bag"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-label">Total Products</span>
-                <h3 class="stat-value">{{ total_products or 0 }}</h3>
-                <span class="stat-change"><a href="{{ url_for('admin.inventory_report') }}" style="color: var(--primary); text-decoration: none;">Manage Inventory</a></span>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-soft-blue">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Total Products</span>
+                    <h3 class="stat-value">{{ total_products or 0 }}</h3>
+                    <span class="stat-change"><a href="{{ url_for('admin.inventory_report') }}" style="color: var(--primary); text-decoration: none;">Manage Inventory</a></span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon bg-soft-green">
-                <i class="fas fa-user-friends"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-label">Active Customers</span>
-                <h3 class="stat-value">{{ total_customers or 0 }}</h3>
-                <span class="stat-change text-muted">Registered users</span>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-soft-green">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Active Customers</span>
+                    <h3 class="stat-value">{{ total_customers or 0 }}</h3>
+                    <span class="stat-change text-muted">Registered users</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 <!-- QUICK LINKS SECTION -->
-<h4 class="mb-4 fw-bold">Seller Actions</h4>
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="action-card">
-            <div class="card-body p-4 text-center">
-                <div class="action-icon text-orange mb-3">
-                    <i class="fas fa-receipt fa-2x"></i>
+    <h4 class="mb-4 fw-bold">Seller Actions</h4>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="action-card">
+                <div class="card-body p-4 text-center">
+                    <div class="action-icon text-orange mb-3">
+                        <i class="fas fa-receipt fa-2x"></i>
+                    </div>
+                    <h5>Sales Analysis</h5>
+                    <p class="text-muted small">Monitor your daily transactions and revenue growth.</p>
+                    <a href="{{ url_for('admin.sales_report') }}" class="btn btn-jumia">View Sales</a>
                 </div>
-                <h5>Sales Analysis</h5>
-                <p class="text-muted small">Monitor your daily transactions and revenue growth.</p>
-                <a href="{{ url_for('admin.sales_report') }}" class="btn btn-jumia">View Sales</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="action-card">
+                <div class="card-body p-4 text-center">
+                    <div class="action-icon text-blue mb-3">
+                        <i class="fas fa-warehouse fa-2x"></i>
+                    </div>
+                    <h5>Stock Tracking</h5>
+                    <p class="text-muted small">Update product availability and check low stock alerts.</p>
+                    <a href="{{ url_for('admin.inventory_report') }}" class="btn btn-outline-jumia">Inventory</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="action-card">
+                <div class="card-body p-4 text-center">
+                    <div class="action-icon text-green mb-3">
+                        <i class="fas fa-id-card fa-2x"></i>
+                    </div>
+                    <h5>Customer Insights</h5>
+                    <p class="text-muted small">Understand your buyers and their shopping preferences.</p>
+                    <a href="{{ url_for('admin.customer_report') }}" class="btn btn-outline-jumia">Customers</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="action-card">
-            <div class="card-body p-4 text-center">
-                <div class="action-icon text-blue mb-3">
-                    <i class="fas fa-warehouse fa-2x"></i>
-                </div>
-                <h5>Stock Tracking</h5>
-                <p class="text-muted small">Update product availability and check low stock alerts.</p>
-                <a href="{{ url_for('admin.inventory_report') }}" class="btn btn-outline-jumia">Inventory</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="action-card">
-            <div class="card-body p-4 text-center">
-                <div class="action-icon text-green mb-3">
-                    <i class="fas fa-id-card fa-2x"></i>
-                </div>
-                <h5>Customer Insights</h5>
-                <p class="text-muted small">Understand your buyers and their shopping preferences.</p>
-                <a href="{{ url_for('admin.customer_report') }}" class="btn btn-outline-jumia">Customers</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
+    <style>
     /* Stat Cards */
-    .stat-card {
-        background: #ffffff;
-        border-radius: 8px;
-        padding: 24px;
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        border: 1px solid #e0e0e0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
 
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
 
-    .bg-soft-orange { background: #fff4e5; color: #f68b1e; }
-    .bg-soft-blue { background: #eef7ff; color: #007185; }
-    .bg-soft-green { background: #ebf9f1; color: #2e7d32; }
+        .bg-soft-orange { background: #fff4e5; color: #f68b1e; }
+        .bg-soft-blue { background: #eef7ff; color: #007185; }
+        .bg-soft-green { background: #ebf9f1; color: #2e7d32; }
 
-    .stat-label {
-        font-size: 14px;
-        color: #757575;
-        display: block;
-        margin-bottom: 4px;
-    }
+        .stat-label {
+            font-size: 14px;
+            color: #757575;
+            display: block;
+            margin-bottom: 4px;
+        }
 
-    .stat-value {
-        font-size: 22px;
-        font-weight: 800;
-        margin-bottom: 4px;
-    }
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
 
-    .stat-change {
-        font-size: 12px;
-        font-weight: 600;
-    }
+        .stat-change {
+            font-size: 12px;
+            font-weight: 600;
+        }
 
     /* Action Cards */
-    .action-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e0e0e0;
-        transition: all 0.3s ease;
-    }
+        .action-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
 
-    .action-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-    }
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
 
-    .text-orange { color: #f68b1e; }
-    .text-blue { color: #007185; }
-    .text-green { color: #2e7d32; }
+        .text-orange { color: #f68b1e; }
+        .text-blue { color: #007185; }
+        .text-green { color: #2e7d32; }
 
-    .btn-jumia {
-        background-color: var(--primary);
-        color: white;
-        border: none;
-        font-weight: 700;
-        padding: 8px 24px;
-        border-radius: 4px;
-    }
+        .btn-jumia {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 700;
+            padding: 8px 24px;
+            border-radius: 4px;
+        }
 
-    .btn-jumia:hover {
-        background-color: var(--primary-dark);
-        color: white;
-    }
+        .btn-jumia:hover {
+            background-color: var(--primary-dark);
+            color: white;
+        }
 
-    .btn-outline-jumia {
-        border: 1px solid var(--primary);
-        color: var(--primary);
-        font-weight: 700;
-        padding: 8px 24px;
-        border-radius: 4px;
-    }
+        .btn-outline-jumia {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 8px 24px;
+            border-radius: 4px;
+        }
 
-    .btn-outline-jumia:hover {
-        background-color: #fff4e5;
-        color: var(--primary);
-        border-color: var(--primary);
-    }
-</style>
+        .btn-outline-jumia:hover {
+            background-color: #fff4e5;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+    </style>
 {% endblock %}

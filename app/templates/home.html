@@ -1,113 +1,113 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Home - Ebenezer Electronics
+    Home - Ebenezer Electronics
 {% endblock %}
 
 {% block content %}
-{% with msgs =  get_flashed_messages(with_categories=True) %}
-	{% for c, msg in msgs %}
-		{% if c == 'error' %}
-			<div class="flash-error">
-		{% else %}
-			<div class="success">
-		{% endif %}
-			{{ msg | safe}}
-		</div>
-	{% endfor %}
-{% endwith %}
+    {% with msgs =  get_flashed_messages(with_categories=True) %}
+        {% for c, msg in msgs %}
+            {% if c == 'error' %}
+                <div class="flash-error">
+            {% else %}
+                <div class="success">
+            {% endif %}
+            {{ msg | safe}}
+            </div>
+        {% endfor %}
+    {% endwith %}
 
-<div class="main-layout">
+    <div class="main-layout">
 	<!-- Sidebar Categories -->
-	<aside class="sidebar">
-		<h3 class="sidebar-title">Categories</h3>
-		<nav class="sidebar-menu">
-			<a href="{{ url_for('products') }}" class="{% if selected_category == 'All' %}active{% endif %}">
-				<i class="fa fa-th-large"></i> All products
-			</a>
-			{% for cat in categories %}
-				<a href="{{ url_for('home', category=cat.value) }}" class="{% if selected_category == cat.value %}active{% endif %}">
-					<i class="fa fa-chevron-right"></i> {{ cat.label }}
-				</a>
-			{% endfor %}
-		</nav>
-	</aside>
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Categories</h3>
+            <nav class="sidebar-menu">
+                <a href="{{ url_for('products') }}" class="{% if selected_category == 'All' %}active{% endif %}">
+                    <i class="fa fa-th-large"></i> All products
+                </a>
+                {% for cat in categories %}
+                    <a href="{{ url_for('home', category=cat.value) }}" class="{% if selected_category == cat.value %}active{% endif %}">
+                        <i class="fa fa-chevron-right"></i> {{ cat.label }}
+                    </a>
+                {% endfor %}
+            </nav>
+        </aside>
 
 	<!-- Main Content Area -->
-	<main class="main-content">
-		{% if not search and selected_category == 'All' %}
+        <main class="main-content">
+            {% if not search and selected_category == 'All' %}
 		<!-- Hero Carousel -->
-		<section class="hero-slider shadow-md">
-			<div class="hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/static/uploads/hero_banner.png');">
-				<div class="hero-content">
-					<h1>The Best Tech. <br>The Best Prices.</h1>
-					<p>Experience precision and performance with our latest electronics collection.</p>
-					<a href="{{ url_for('products') }}" class="hero-btn">SHOP NOW</a>
-				</div>
-			</div>
-		</section>
-		{% endif %}
+                <section class="hero-slider shadow-md">
+                    <div class="hero-slide" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/static/uploads/hero_banner.png');">
+                        <div class="hero-content">
+                            <h1>The Best Tech. <br>The Best Prices.</h1>
+                            <p>Experience precision and performance with our latest electronics collection.</p>
+                            <a href="{{ url_for('products') }}" class="hero-btn">SHOP NOW</a>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
 
 		<!-- Products Section -->
-		<section class="section-body shadow-sm">
-			<div class="section-heading" style="margin-bottom: 20px;">
-				<h2 style="color: var(--text); font-weight: 700;">
-					{% if search %}
-						Search results for “{{ query }}”
-					{% elif selected_category != 'All' %}
-						{{ selected_category_label }}
-					{% else %}
-						Trending Gadgets
-					{% endif %}
-				</h2>
-			</div>
+            <section class="section-body shadow-sm">
+                <div class="section-heading" style="margin-bottom: 20px;">
+                    <h2 style="color: var(--text); font-weight: 700;">
+                        {% if search %}
+                            Search results for "{{ query }}"
+                        {% elif selected_category != 'All' %}
+                            {{ selected_category_label }}
+                        {% else %}
+                            Trending Gadgets
+                        {% endif %}
+                    </h2>
+                </div>
 
-			{% if items %}
-			<div class="items-grid">
-				{% for product in items %}
-					<div class="product-card">
-						<a href="{{ url_for('item', id=product.id) }}" class="product-image">
-							<img loading="lazy" src="{{ product.display_image }}" alt="{{ product.name }}">
-						</a>
-						<div class="product-info">
-							<a href="{{ url_for('item', id=product.id) }}" class="product-name">{{ product.name }}</a>
-							<div class="product-price">{{ product.price | currency_kes }}</div>
-							<div class="product-rating">
-								<i class="fa fa-star"></i> 4.{{ range(5, 9) | random }} 
-								<span>({{ range(10, 50) | random }})</span>
-							</div>
-							<form method="POST" action="{{ url_for('add_to_cart', id=product.id) }}">
-								<input type="hidden" name="quantity" value="1">
-								<button type="submit" class="btn-buy">ADD TO CART</button>
-							</form>
-						</div>
-					</div>
-				{% endfor %}
-			</div>
-			{% else %}
-				<div style="padding: 40px; text-align: center; color: var(--text-muted);">
-					<i class="fa fa-search-minus" style="font-size: 48px; margin-bottom: 20px;"></i>
-					<p>No products found in this category.</p>
-					<a href="{{ url_for('home') }}" class="text-primary" style="font-weight: 600;">Browse all categories</a>
-				</div>
-			{% endif %}
-		</section>
+                {% if items %}
+                    <div class="items-grid">
+                        {% for product in items %}
+                            <div class="product-card">
+                                <a href="{{ url_for('item', id=product.id) }}" class="product-image">
+                                    <img loading="lazy" src="{{ product.display_image }}" alt="{{ product.name }}">
+                                </a>
+                                <div class="product-info">
+                                    <a href="{{ url_for('item', id=product.id) }}" class="product-name">{{ product.name }}</a>
+                                    <div class="product-price">{{ product.price | currency_kes }}</div>
+                                    <div class="product-rating">
+                                        <i class="fa fa-star"></i> 4.{{ range(5, 9) | random }}
+                                        <span>({{ range(10, 50) | random }})</span>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('add_to_cart', id=product.id) }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn-buy">ADD TO CART</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        <i class="fa fa-search-minus" style="font-size: 48px; margin-bottom: 20px;"></i>
+                        <p>No products found in this category.</p>
+                        <a href="{{ url_for('home') }}" class="text-primary" style="font-weight: 600;">Browse all categories</a>
+                    </div>
+                {% endif %}
+            </section>
 
-		{% if selected_category == 'All' %}
+            {% if selected_category == 'All' %}
 		<!-- Featured Collections -->
-		<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px;">
-			<div style="background: white; padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm);">
-				<h4 style="margin-bottom: 12px;">Official Sony Store</h4>
-				<img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 12px;">
-				<a href="{{ url_for('home', category='electronics') }}" class="text-primary" style="font-size: 14px; font-weight: 600;">Shop Audio & TV →</a>
-			</div>
-			<div style="background: white; padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm);">
-				<h4 style="margin-bottom: 12px;">Gaming Paradise</h4>
-				<img src="https://images.unsplash.com/photo-1605898911550-13783967d71b?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 12px;">
-				<a href="{{ url_for('home', category='gaming') }}" class="text-primary" style="font-size: 14px; font-weight: 600;">Explore Consoles →</a>
-			</div>
-		</div>
-		{% endif %}
-	</main>
-</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        <h4 style="margin-bottom: 12px;">Official Sony Store</h4>
+                        <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 12px;">
+                        <a href="{{ url_for('home', category='electronics') }}" class="text-primary" style="font-size: 14px; font-weight: 600;">Shop Audio & TV →</a>
+                    </div>
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        <h4 style="margin-bottom: 12px;">Gaming Paradise</h4>
+                        <img src="https://images.unsplash.com/photo-1605898911550-13783967d71b?auto=format&fit=crop&w=400&q=80" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 12px;">
+                        <a href="{{ url_for('home', category='gaming') }}" class="text-primary" style="font-size: 14px; font-weight: 600;">Explore Consoles →</a>
+                    </div>
+                </div>
+            {% endif %}
+        </main>
+    </div>
 {% endblock %}

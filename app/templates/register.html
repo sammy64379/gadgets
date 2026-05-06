@@ -1,42 +1,42 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Register - Ebenezer Electronics
+    Register - Ebenezer Electronics
 {% endblock %}
 
 {% block content %}
-<div class="auth-wrapper">
-	<div style="width: 100%; max-width: 400px;">
-		<div class="auth-logo">
-			Ebenezer <span>Electronics</span>
-		</div>
-		
-		<div class="auth-box">
-			<h2>Create account</h2>
-			
-			{% with msgs = get_flashed_messages(with_categories=True) %}
-				{% for c, msg in msgs %}
-					{% if c == 'error' %}
-						<div class="flash-error flash-message" style="margin-bottom: 16px; position: static; animation: none;">
-					{% else %}
-						<div class="success flash-message" style="margin-bottom: 16px; position: static; animation: none;">
-					{% endif %}
-						{{ msg | safe }}</div>
-				{% endfor %}
-			{% endwith %}
-			
-			{{ wtf.quick_form(form) }}
-			
-			<div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-				By creating an account, you agree to Ebenezer Electronics' <a href="#" style="color: var(--secondary);">Conditions of Use</a> and <a href="#" style="color: var(--secondary);">Privacy Notice</a>.
-			</div>
-			
-			<div class="auth-divider" style="margin: 16px 0;"></div>
-			
-			<div style="font-size: 13px; color: var(--text);">
-				Already have an account? <a href="{{ url_for('login') }}" style="color: var(--secondary); font-weight: 600;">Sign in <i class="fa fa-caret-right"></i></a>
-			</div>
-		</div>
-	</div>
-</div>
+    <div class="auth-wrapper">
+        <div style="width: 100%; max-width: 400px;">
+            <div class="auth-logo">
+                Ebenezer <span>Electronics</span>
+            </div>
+
+            <div class="auth-box">
+                <h2>Create account</h2>
+
+                {% with msgs = get_flashed_messages(with_categories=True) %}
+                    {% for c, msg in msgs %}
+                        {% if c == 'error' %}
+                            <div class="flash-error flash-message" style="margin-bottom: 16px; position: static; animation: none;">
+                        {% else %}
+                            <div class="success flash-message" style="margin-bottom: 16px; position: static; animation: none;">
+                        {% endif %}
+                        {{ msg | safe }}</div>
+                    {% endfor %}
+                {% endwith %}
+
+                {{ wtf.quick_form(form) }}
+
+                <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                    By creating an account, you agree to Ebenezer Electronics' <a href="#" style="color: var(--secondary);">Conditions of Use</a> and <a href="#" style="color: var(--secondary);">Privacy Notice</a>.
+                </div>
+
+                <div class="auth-divider" style="margin: 16px 0;"></div>
+
+                <div style="font-size: 13px; color: var(--text);">
+                    Already have an account? <a href="{{ url_for('login') }}" style="color: var(--secondary); font-weight: 600;">Sign in <i class="fa fa-caret-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

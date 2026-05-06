@@ -1,79 +1,79 @@
 {% extends "base.html" %}
 
 {% block title %}
-	{{ item.name }} - Ebenezer Electronics
+    {{ item.name }} - Ebenezer Electronics
 {% endblock %}
 
 {% block content %}
-{% with msgs =  get_flashed_messages(with_categories=True) %}
-{% for c, msg in msgs %}
-	{% if c == 'error' %}
-		<div class="flash-error">
-	{% else %}
-		<div class="success">
-	{% endif %}
-		{{ msg | safe}}</div><br>
-{% endfor %}
-{% endwith %}
+    {% with msgs =  get_flashed_messages(with_categories=True) %}
+        {% for c, msg in msgs %}
+            {% if c == 'error' %}
+                <div class="flash-error">
+            {% else %}
+                <div class="success">
+            {% endif %}
+            {{ msg | safe}}</div><br>
+        {% endfor %}
+    {% endwith %}
 
-<div class="container" style="margin-top: 24px;">
-	<div style="background: white; border-radius: 8px; padding: 24px; box-shadow: var(--shadow-sm); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
+    <div class="container" style="margin-top: 24px;">
+        <div style="background: white; border-radius: 8px; padding: 24px; box-shadow: var(--shadow-sm); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
 		<!-- Product Image -->
-		<div style="display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-light); border-radius: 4px; padding: 20px;">
-			<img src="{{ item.display_image }}" alt="{{ item.name }}" style="max-width: 100%; max-height: 400px; object-fit: contain;">
-		</div>
+            <div style="display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-light); border-radius: 4px; padding: 20px;">
+                <img src="{{ item.display_image }}" alt="{{ item.name }}" style="max-width: 100%; max-height: 400px; object-fit: contain;">
+            </div>
 
 		<!-- Product Info -->
-		<div>
-			<h1 style="font-size: 24px; font-weight: 600; margin-bottom: 8px; color: var(--text);">{{ item.name }}</h1>
-			<p style="color: var(--primary); font-size: 14px; font-weight: 600; text-transform: uppercase;">Category: {{ category_label }}</p>
-			
-			<div style="margin: 16px 0; padding: 16px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
-				<div style="font-size: 28px; font-weight: 800; color: var(--text);">{{ item.price | currency_kes }}</div>
-				<div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">In Stock: {{ item.stock }} units</div>
-			</div>
+            <div>
+                <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 8px; color: var(--text);">{{ item.name }}</h1>
+                <p style="color: var(--primary); font-size: 14px; font-weight: 600; text-transform: uppercase;">Category: {{ category_label }}</p>
 
-			<div style="margin-bottom: 24px;">
-				<h4 style="font-size: 14px; margin-bottom: 8px;">Key Features:</h4>
-				<ul style="font-size: 14px; color: var(--text-muted); padding-left: 20px;">
-					{% for spec in specs[:4] %}
-						<li>{{ spec[0] }}: {{ spec[1] }}</li>
-					{% endfor %}
-				</ul>
-			</div>
+                <div style="margin: 16px 0; padding: 16px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+                    <div style="font-size: 28px; font-weight: 800; color: var(--text);">{{ item.price | currency_kes }}</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">In Stock: {{ item.stock }} units</div>
+                </div>
 
-			<form action="{{ url_for('add_to_cart', id=item.id) }}" method="POST">
-				<div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
-					<label for="quantity" style="font-size: 14px; font-weight: 600;">Qty:</label>
-					<input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ item.stock }}" style="width: 60px; padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
-				</div>
-				<button type="submit" class="hero-btn" style="width: 100%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
-					<i class="fa fa-shopping-cart"></i> ADD TO CART
-				</button>
-			</form>
-		</div>
-	</div>
+                <div style="margin-bottom: 24px;">
+                    <h4 style="font-size: 14px; margin-bottom: 8px;">Key Features:</h4>
+                    <ul style="font-size: 14px; color: var(--text-muted); padding-left: 20px;">
+                        {% for spec in specs[:4] %}
+                            <li>{{ spec[0] }}: {{ spec[1] }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <form action="{{ url_for('add_to_cart', id=item.id) }}" method="POST">
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+                        <label for="quantity" style="font-size: 14px; font-weight: 600;">Qty:</label>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ item.stock }}" style="width: 60px; padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+                    </div>
+                    <button type="submit" class="hero-btn" style="width: 100%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i class="fa fa-shopping-cart"></i> ADD TO CART
+                    </button>
+                </form>
+            </div>
+        </div>
 
 	<!-- Long Description & Extras -->
-	<div style="margin-top: 24px; background: white; border-radius: 8px; padding: 24px; box-shadow: var(--shadow-sm);">
-		<h3 style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px;">Product Details</h3>
-		<p style="color: var(--text-muted); font-size: 15px; line-height: 1.6;">{{ item.details }}</p>
-		
-		<div style="margin-top: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
-			<div>
-				<h4 style="font-size: 14px; margin-bottom: 8px;"><i class="fa fa-truck text-primary"></i> Shipping Info</h4>
-				<p style="font-size: 13px; color: var(--text-muted);">Same-day delivery in Nairobi. 2-3 business days for upcountry orders.</p>
-			</div>
-			<div>
-				<h4 style="font-size: 14px; margin-bottom: 8px;"><i class="fa fa-shield text-primary"></i> Warranty</h4>
-				<p style="font-size: 13px; color: var(--text-muted);">1-year official manufacturer warranty. Valid at all authorized service centers.</p>
-			</div>
-			<div>
-				<h4 style="font-size: 14px; margin-bottom: 8px;"><i class="fa fa-refresh text-primary"></i> Return Policy</h4>
-				<p style="font-size: 13px; color: var(--text-muted);">Easy 7-day return policy for unopened items. Terms and conditions apply.</p>
-			</div>
-		</div>
-	</div>
-</div>
+        <div style="margin-top: 24px; background: white; border-radius: 8px; padding: 24px; box-shadow: var(--shadow-sm);">
+            <h3 style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 16px;">Product Details</h3>
+            <p style="color: var(--text-muted); font-size: 15px; line-height: 1.6;">{{ item.details }}</p>
+
+            <div style="margin-top: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 8px;"><i class="fa fa-truck text-primary"></i> Shipping Info</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Same-day delivery in Nairobi. 2-3 business days for upcountry orders.</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 8px;"><i class="fa fa-shield text-primary"></i> Warranty</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">1-year official manufacturer warranty. Valid at all authorized service centers.</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 8px;"><i class="fa fa-refresh text-primary"></i> Return Policy</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Easy 7-day return policy for unopened items. Terms and conditions apply.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

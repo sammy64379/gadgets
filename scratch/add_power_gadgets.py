@@ -5,34 +5,41 @@ import os
 import sqlite3
 
 DB_PATH = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\test.db"
-UPLOADS_DIR = r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+UPLOADS_DIR = (
+    r"c:\Users\sammy\OneDrive\Desktop\electronics e commerce\app\static\uploads"
+)
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
 }
 
+
 def search_bing_images(query):
     url = f"https://www.bing.com/images/search?q={urllib.parse.quote(query)}&qft=+filterui:imagesize-large"
     response = requests.get(url, headers=HEADERS, timeout=10)
-    return re.findall(r'murl&quot;:&quot;(.*?)&quot;', response.text)
+    return re.findall(r"murl&quot;:&quot;(.*?)&quot;", response.text)
+
 
 def download_best(urls, filename, min_size=15000):
     for url in urls:
-        url = url.replace('&amp;', '&')
+        url = url.replace("&amp;", "&")
         try:
             resp = requests.get(url, headers=HEADERS, timeout=10)
-            if resp.status_code != 200 or 'text/html' in resp.headers.get('Content-Type', ''):
+            if resp.status_code != 200 or "text/html" in resp.headers.get(
+                "Content-Type", ""
+            ):
                 continue
             if len(resp.content) < min_size:
                 continue
             path = os.path.join(UPLOADS_DIR, filename)
-            with open(path, 'wb') as f:
+            with open(path, "wb") as f:
                 f.write(resp.content)
             return True
         except Exception:
             pass
     return False
+
 
 # New Power & Charging Gadgets
 new_power = [
@@ -75,7 +82,7 @@ new_power = [
         "search": "Satechi 200W USB-C 6-Port GaN Charger product isolated white background",
         "filename": "satechi-200w-charger-premium.jpg",
         "details": "Next-gen Gallium Nitride technology. Charge up to 6 devices with an ultimate output of 200W.",
-    }
+    },
 ]
 
 conn = sqlite3.connect(DB_PATH)
@@ -83,14 +90,23 @@ c = conn.cursor()
 
 for item in new_power:
     print(f"Searching for: {item['name']}")
-    urls = search_bing_images(item['search'])
-    if download_best(urls, item['filename']):
+    urls = search_bing_images(item["search"])
+    if download_best(urls, item["filename"]):
         new_path = f"/static/uploads/{item['filename']}"
         # Check if already exists to avoid duplicates
-        c.execute("SELECT id FROM items WHERE name = ?", (item['name'],))
+        c.execute("SELECT id FROM items WHERE name = ?", (item["name"],))
         if not c.fetchone():
-            c.execute("INSERT INTO items (name, price, category, image, details, stock) VALUES (?, ?, ?, ?, ?, ?)", 
-                     (item['name'], item['price'], item['category'], new_path, item['details'], 20))
+            c.execute(
+                "INSERT INTO items (name, price, category, image, details, stock) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    item["name"],
+                    item["price"],
+                    item["category"],
+                    new_path,
+                    item["details"],
+                    20,
+                ),
+            )
             print(f"  Added: {item['name']}")
         else:
             print(f"  Skip: {item['name']} already in DB.")

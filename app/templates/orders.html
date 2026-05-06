@@ -1,59 +1,59 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Orders - Ebenezer Electronics
+    Orders - Ebenezer Electronics
 {% endblock %}
 {% block content %}
-	{% with msgs =  get_flashed_messages(with_categories=True) %}
-	{% for c, msg in msgs %}
-		{% if c == 'error' %}
-			<div class="flash-error">
-		{% else %}
-			<div class="success">
-		{% endif %}
-			{{ msg | safe }}</div><br>
-	{% endfor %}
-	{% endwith %}
+    {% with msgs =  get_flashed_messages(with_categories=True) %}
+        {% for c, msg in msgs %}
+            {% if c == 'error' %}
+                <div class="flash-error">
+            {% else %}
+                <div class="success">
+            {% endif %}
+            {{ msg | safe }}</div><br>
+        {% endfor %}
+    {% endwith %}
 
     {% if not orders %}
-		<div class="flash-error">
-			You haven't placed any orders yet.<br>
-			<a href="{{ url_for('home') }}">Discover new items</a>
-		</div>
-	{% else %}
+        <div class="flash-error">
+            You haven't placed any orders yet.<br>
+            <a href="{{ url_for('home') }}">Discover new items</a>
+        </div>
+    {% else %}
 
-    <table class="table table-borderless">
-        <thead>
-			<tr>
-				<th>Order #</th>
-				<th>Date</th>
-				<th>Items</th>
-				<th>Total (KES)</th>
-				<th>Status</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for order in orders %}
-			<tr style="background: var(--white); border-radius: 12px; box-shadow: 0 10px 25px rgba(15,23,42,0.08);">
-				<td>{{ order.id }}</td>
-				<td>{{ order.date.strftime('%d %b %Y, %I:%M %p') }}</td>
-				<td>
-					{% for i in order.items %}
-						{{ i.item.name }} x <span class="success">{{ i.quantity }}</span><br>
-					{% endfor %}
-				</td>
-				<td>
-					{% set total = 0 %}
-					{% for i in order.items %}
-						{% set total = total + (i.quantity * i.item.price) %}
-					{% endfor %}
-					{{ total | currency_kes }}
-				</td>
-				<td><span class="badge badge-pill badge-primary" style="background: var(--accent);">{{ order.status|title }}</span></td>
-			</tr>
-		{% endfor %}
-		</tbody>
-    </table>
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total (KES)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr style="background: var(--white); border-radius: 12px; box-shadow: 0 10px 25px rgba(15,23,42,0.08);">
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.date.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        <td>
+                            {% for i in order.items %}
+                                {{ i.item.name }} x <span class="success">{{ i.quantity }}</span><br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% set total = 0 %}
+                            {% for i in order.items %}
+                                {% set total = total + (i.quantity * i.item.price) %}
+                            {% endfor %}
+                            {{ total | currency_kes }}
+                        </td>
+                        <td><span class="badge badge-pill badge-primary" style="background: var(--accent);">{{ order.status|title }}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-	{% endif %}
+    {% endif %}
 {% endblock %}

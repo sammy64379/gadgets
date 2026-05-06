@@ -105,6 +105,14 @@ ul { list-style: none; }
     gap: 24px;
 }
 
+@media (max-width: 768px) {
+    .nav-content {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 0 10px;
+    }
+}
+
 .navbar-brand {
     font-size: 24px;
     font-weight: 800;
@@ -116,10 +124,25 @@ ul { list-style: none; }
 
 .navbar-brand span { color: var(--text); }
 
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 18px;
+        order: 1;
+    }
+}
+
 .search-bar {
     flex: 1;
     display: flex;
     position: relative;
+}
+
+@media (max-width: 768px) {
+    .search-bar {
+        order: 3;
+        flex: 1 1 100%;
+        margin-top: 8px;
+    }
 }
 
 .search-bar input {
@@ -148,6 +171,17 @@ ul { list-style: none; }
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .nav-actions {
+        order: 2;
+        gap: 12px;
+        margin-left: auto;
+    }
+    .nav-item span, .nav-item .nav-link-text {
+        display: none; /* Hide text on mobile for items like "Login" if they have icons */
+    }
 }
 
 .nav-item {
@@ -253,6 +287,22 @@ ul { list-style: none; }
     margin-top: 24px;
 }
 
+@media (max-width: 768px) {
+    .hero-slider {
+        height: 250px;
+    }
+    .hero-slide {
+        padding: 24px;
+    }
+    .hero-content h1 {
+        font-size: 24px;
+    }
+    .hero-btn {
+        padding: 8px 20px;
+        font-size: 13px;
+    }
+}
+
 /* ============================================
    PRODUCT CARDS
    ============================================ */
@@ -260,6 +310,23 @@ ul { list-style: none; }
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px;
+}
+
+@media (max-width: 576px) {
+    .items-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 0 4px;
+    }
+    .product-card {
+        padding: 8px;
+    }
+    .product-name {
+        font-size: 12px;
+    }
+    .product-price {
+        font-size: 15px;
+    }
 }
 
 .product-card {
